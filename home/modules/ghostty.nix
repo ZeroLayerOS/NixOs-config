@@ -5,53 +5,97 @@
 
 {
   programs.ghostty = {
-    enable  = true;
-    package = pkgs.ghostty;
-
-    # Zsh shell integration — provides prompt marks, working directory tracking,
-    # and cursor shape changes on command execution.
+    enable               = true;
+    package              = pkgs.ghostty;
     enableZshIntegration = true;
 
     settings = {
-      # Font
+      # ── Font ──────────────────────────────────────────────────────────────
       font-family = "JetBrainsMono Nerd Font";
       font-size   = 13;
 
-      # Gruvbox Dark Hard palette
-      # background / foreground are set via the theme block below
-      theme               = "GruvboxDark";
-      background-opacity  = 0.92;
-      background-blur     = true;
+      # ── Theme ─────────────────────────────────────────────────────────────
+      # "GruvboxDark" below refers to the custom theme defined in
+      # themes.GruvboxDark (Hard variant), not Ghostty's built-in soft one.
+      theme              = "GruvboxDark";
+      background-opacity = 0.92;
+      background-blur    = true;
 
-      # Window
+      # ── Window ────────────────────────────────────────────────────────────
       window-decoration = false;
       window-padding-x  = 12;
       window-padding-y  = 10;
 
-      # Cursor
-      cursor-style          = "bar";
-      cursor-style-blink    = true;
+      # ── Cursor ────────────────────────────────────────────────────────────
+      cursor-style       = "bar";
+      cursor-style-blink = true;
 
-      # Scrollback
+      # ── Scrollback ────────────────────────────────────────────────────────
       scrollback-limit = 10000;
 
-      # Shell
-      shell-integration       = "zsh";
+      # ── Shell integration ─────────────────────────────────────────────────
+      # enableZshIntegration above handles sourcing; these options tune what
+      # the integration exposes (cursor shape, sudo wrapper, title tracking).
+      shell-integration          = "zsh";
       shell-integration-features = "cursor,sudo,title";
 
-      # Misc
+      # ── Misc ──────────────────────────────────────────────────────────────
       mouse-hide-while-typing = true;
       copy-on-select          = false;
       confirm-close-surface   = false;
+
+      # ── Keybindings ───────────────────────────────────────────────────────
+      # CTRL-A leader mirrors the WezTerm/tmux mental model.
+      # keybind belongs inside settings — it is a Ghostty config key,
+      # not a Home Manager module attribute.
+      keybind = [
+        # Tabs
+        "ctrl+a>c=new_tab"
+        "ctrl+a>n=next_tab"
+        "ctrl+a>p=previous_tab"
+        "ctrl+a>w=close_surface"
+
+        # Splits
+        "ctrl+a>shift+percent=new_split:right"
+        "ctrl+a>shift+quotedbl=new_split:down"
+
+        # Pane navigation (vim keys)
+        "ctrl+h=goto_split:left"
+        "ctrl+l=goto_split:right"
+        "ctrl+k=goto_split:top"
+        "ctrl+j=goto_split:bottom"
+
+        # Zoom / fullscreen
+        "ctrl+a>z=toggle_split_zoom"
+
+        # Quick tab switch
+        "alt+1=goto_tab:1"
+        "alt+2=goto_tab:2"
+        "alt+3=goto_tab:3"
+        "alt+4=goto_tab:4"
+
+        # Font size
+        "ctrl+equal=increase_font_size:1"
+        "ctrl+minus=decrease_font_size:1"
+        "ctrl+zero=reset_font_size"
+
+        # Clipboard
+        "ctrl+shift+c=copy_to_clipboard"
+        "ctrl+shift+v=paste_from_clipboard"
+
+        # Reload config
+        "ctrl+a>r=reload_config"
+      ];
     };
 
-    # Custom Gruvbox Dark Hard colour theme.
-    # Ghostty's built-in "GruvboxDark" uses the soft variant;
-    # this override matches the Hard variant used everywhere else.
+    # ── Custom Gruvbox Dark Hard colour theme ────────────────────────────────
+    # Ghostty's built-in "GruvboxDark" is the *soft* variant.
+    # This block overrides it with the Hard variant (#1d2021 background)
+    # so every tool in the stack uses the same base colour.
     themes.GruvboxDark = {
-      background         = "1d2021";
-      foreground         = "ebdbb2";
-      cursor-color       = "d79921";
+      background           = "1d2021";
+      foreground           = "ebdbb2";
+      cursor-color         = "d79921";
       selection-background = "504945";
       selection-foreground = "ebdbb2";
 
@@ -74,46 +118,5 @@
         "15=#ebdbb2"  # bright white
       ];
     };
-
-    # Keybindings — CTRL-A leader to mirror the WezTerm/tmux layout.
-    # Navigation uses vim keys; splits use leader+direction.
-    settings.keybind = [
-      # Tabs
-      "ctrl+a>c=new_tab"
-      "ctrl+a>n=next_tab"
-      "ctrl+a>p=previous_tab"
-      "ctrl+a>w=close_surface"
-
-      # Splits
-      "ctrl+a>shift+percent=new_split:right"
-      "ctrl+a>shift+quotedbl=new_split:down"
-
-      # Pane navigation (vim keys)
-      "ctrl+h=goto_split:left"
-      "ctrl+l=goto_split:right"
-      "ctrl+k=goto_split:top"
-      "ctrl+j=goto_split:bottom"
-
-      # Zoom / fullscreen
-      "ctrl+a>z=toggle_split_zoom"
-
-      # Quick tab switch
-      "alt+1=goto_tab:1"
-      "alt+2=goto_tab:2"
-      "alt+3=goto_tab:3"
-      "alt+4=goto_tab:4"
-
-      # Font size
-      "ctrl+equal=increase_font_size:1"
-      "ctrl+minus=decrease_font_size:1"
-      "ctrl+zero=reset_font_size"
-
-      # Clipboard
-      "ctrl+shift+c=copy_to_clipboard"
-      "ctrl+shift+v=paste_from_clipboard"
-
-      # Reload config
-      "ctrl+a>r=reload_config"
-    ];
   };
 }
