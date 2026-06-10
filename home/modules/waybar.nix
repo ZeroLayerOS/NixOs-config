@@ -174,9 +174,7 @@
       "custom/power" = {
         format   = "󰐥";
         tooltip  = false;
-        on-click = ''
-          wofi --show power-menu
-        '';
+        on-click = "wofi-power-menu" ;
       };
     }];
 

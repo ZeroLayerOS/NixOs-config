@@ -94,7 +94,7 @@
           enabled      = true;
           range        = 15;
           render_power = 3;
-          color        = "rgba(0,0,0,0.5)";
+          color        = "rgba(00000080)";
         };
         inactive_opacity = 0.93;
         active_opacity   = 1.0;
