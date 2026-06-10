@@ -71,7 +71,7 @@
             # Forward inputs so zizo.nix can reference zen-browser, hyprland, etc.
             extraSpecialArgs = { inherit inputs; };
 
-            users.ziad = import ./home/zizo.nix;
+            users.ziad = import ./home/ziad.nix;
           };
         }
       ];

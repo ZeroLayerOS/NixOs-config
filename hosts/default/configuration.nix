@@ -93,7 +93,11 @@
     wayland.enable = true;
     package = pkgs.kdePackages.sddm;
     theme   = "sddm-astronaut-theme";
-    extraPackages = [ pkgs.sddm-astronaut ];
+    extraPackages = [ 
+      pkgs.sddm-astronaut 
+      pkgs.kdePackages.qtmultimedia 
+    ];
+
     settings = {
       Theme.CursorTheme = "Bibata-Modern-Amber";
     };

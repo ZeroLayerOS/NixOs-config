@@ -161,8 +161,8 @@
       paste = "wl-paste";
 
       # Quick config access
-      zshrc    = "nvim ~/dotfiles/home/zizo/modules/shell.nix";
-      hyprconf = "nvim ~/dotfiles/home/zizo/modules/hyprland.nix";
+      zshrc    = "nvim ~/dotfiles/home/ziad/modules/shell.nix";
+      hyprconf = "nvim ~/dotfiles/home/ziad/modules/hyprland.nix";
       dotfiles = "cd ~/dotfiles && nvim .";
 
       # Cargo shortcuts
