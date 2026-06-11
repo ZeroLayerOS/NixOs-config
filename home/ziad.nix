@@ -30,8 +30,8 @@
       fastfetch
       eza          # modern ls replacement
       bat          # syntax-highlighted cat
-      fd           # fast find alternative
-      ripgrep      # fast grep alternative
+     #fd           # fast find alternative
+     # ripgrep      # fast grep alternative
       fzf          # fuzzy finder
       zoxide       # smarter directory jumping
       delta        # better git diff pager
@@ -60,7 +60,7 @@
       blueman
 
       # Development toolchain
-      gcc
+      #gcc
       gnumake
       cmake
       pkg-config
@@ -241,7 +241,7 @@
   settings = {
     width         = 600;
     height        = 400;
-    terminal      = "${pkgs.ghostty}/bin/ghostty";
+    #terminal      = "${pkgs.ghostty}/bin/ghostty";
     show          = "drun";
     insensitive   = true;
     prompt        = "Search...";
