@@ -41,7 +41,7 @@
       dust         # disk usage analyser
       tokei        # code statistics
       procs        # modern ps replacement (aliased in shell.nix)
-
+      okular
       # Wayland / Hyprland ecosystem
      # rofi-wayland
       swww             # animated wallpaper daemon
@@ -136,6 +136,8 @@
         "image/png"              = "imv.desktop";
         "video/mp4"              = "mpv.desktop";
         "inode/directory"        = "thunar.desktop";
+        "application/pdf"        = "okular.desktop";
+        "application/x-pdf"      = "okular.desktop";
       };
     };
   };
