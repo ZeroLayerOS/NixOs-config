@@ -44,8 +44,8 @@
       ];
 
       exec-once = [
-        "swww-daemon"
-        "swww img ~/.config/hypr/wallpaper.jpg --transition-type wipe"
+        "swww-daemon && swww img ~/.config/hypr/wallpaper.jpg --transition-type wipe"
+        
         # waybar  — started by systemd via programs.waybar.systemd.enable
         # dunst   — started by systemd via services.dunst.enable
         # hypridle — started by systemd via services.hypridle.enable
