@@ -108,7 +108,8 @@
       find = "fd";
 
       # cd → zoxide
-      cd = "z";
+      #cd = "z";
+      j = "z";
 
       # Git shortcuts
       g    = "git";
@@ -130,10 +131,14 @@
       vim = "nvim";
 
       # NixOS rebuild helpers
-      rebuild          = "sudo nixos-rebuild switch --flake ~/dotfiles#zizo";
-      rebuild-test     = "sudo nixos-rebuild test   --flake ~/dotfiles#zizo";
-      rebuild-boot     = "sudo nixos-rebuild boot   --flake ~/dotfiles#zizo";
-      nix-update       = "nix flake update ~/dotfiles";
+      #rebuild          = "sudo nixos-rebuild switch --flake ~/dotfiles#zizo";
+      #rebuild-test     = "sudo nixos-rebuild test   --flake ~/dotfiles#zizo";
+      #rebuild-boot     = "sudo nixos-rebuild boot   --flake ~/dotfiles#zizo";
+      #nix-update       = "nix flake update ~/dotfiles";
+      rebuild      = "sudo nixos-rebuild switch --flake ~/nixos-config#zizo";
+      rebuild-test = "sudo nixos-rebuild test   --flake ~/nixos-config#zizo";
+      rebuild-boot = "sudo nixos-rebuild boot   --flake ~/nixos-config#zizo";
+      nix-update   = "nix flake update ~/nixos-config";
       nix-clean        = "sudo nix-collect-garbage -d";
       nix-generations  = "sudo nix-env --list-generations --profile /nix/var/nix/profiles/system";
 
@@ -161,10 +166,12 @@
       paste = "wl-paste";
 
       # Quick config access
-      zshrc    = "nvim ~/dotfiles/home/ziad/modules/shell.nix";
-      hyprconf = "nvim ~/dotfiles/home/ziad/modules/hyprland.nix";
-      dotfiles = "cd ~/dotfiles && nvim .";
-
+     # zshrc    = "nvim ~/dotfiles/home/ziad/modules/shell.nix";
+      #hyprconf = "nvim ~/dotfiles/home/ziad/modules/hyprland.nix";
+      zshrc    = "nvim ~/nixos-config/home/modules/shell.nix";
+      hyprconf = "nvim ~/nixos-config/home/modules/hyprland.nix";
+      #dotfiles = "cd ~/dotfiles && nvim .";
+      dotfiles = "cd ~/nixos-config && nvim .";
       # Cargo shortcuts
       cr  = "cargo run";
       cb  = "cargo build";
