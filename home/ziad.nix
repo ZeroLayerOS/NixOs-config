@@ -82,7 +82,7 @@
   # GTK is handled manually below with gruvbox-gtk-theme.
   # Cursor is managed by gtk.cursorTheme to avoid a double-definition conflict.
   stylix.targets.gtk.enable      = false;
-  stylix.targets.cursor.enable   = false;
+#  stylix.targets.cursor.enable   = false;
   stylix.targets.hyprland.enable = false;
 
   # GTK theming — Gruvbox Dark BL variant

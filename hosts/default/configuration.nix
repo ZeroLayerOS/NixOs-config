@@ -7,7 +7,7 @@
 {
   imports = [ ./hardware-configuration.nix ];
 
-  # Nix daemon settings
+  # ── Nix daemon ────────────────────────────────────────────────────────────
   nix = {
     settings = {
       experimental-features = [ "nix-command" "flakes" ];
@@ -34,7 +34,7 @@
   # Allow proprietary packages (required for NVIDIA drivers)
   nixpkgs.config.allowUnfree = true;
 
-  # Boot loader
+  # ── Boot loader ───────────────────────────────────────────────────────────
   boot = {
     loader = {
       systemd-boot = {
@@ -43,8 +43,7 @@
       };
       efi = {
         canTouchEfiVariables = true;
-        # EFI partition is mounted at /boot/efi (not /boot)
-        efiSysMountPoint = "/boot/efi";
+        efiSysMountPoint     = "/boot/efi";
       };
       timeout = 3;
     };
@@ -53,9 +52,9 @@
     # Plymouth is disabled — known to break SDDM on NixOS 25.05+ (nixpkgs#431207)
   };
 
-  # Network
+  # ── Network ───────────────────────────────────────────────────────────────
   networking = {
-    hostName       = "zizo";
+    hostName              = "zizo";
     networkmanager.enable = true;
     firewall = {
       enable          = true;
@@ -63,6 +62,7 @@
     };
   };
 
+  # ── Locale / time ─────────────────────────────────────────────────────────
   time.timeZone = "Africa/Cairo";
 
   i18n = {
@@ -77,6 +77,7 @@
     ];
   };
 
+  # ── GPU ───────────────────────────────────────────────────────────────────
   # X server is required even on Wayland for XWayland and driver initialisation
   services.xserver = {
     enable       = true;
@@ -87,24 +88,61 @@
     };
   };
 
-  # SDDM display manager — Qt6 build required for sddm-astronaut theme
-  services.displayManager.sddm = {
-    enable  = true;
-    wayland.enable = true;
-    package = pkgs.kdePackages.sddm;
-    theme   = "sddm-astronaut-theme";
-    extraPackages = [ 
-      pkgs.sddm-astronaut 
-      pkgs.kdePackages.qtmultimedia 
-    ];
+  hardware.nvidia = {
+    modesetting.enable = true;
 
+    # Fine-grained power management — turns the dGPU fully off when idle.
+    # Supported on Turing (RTX 20xx) and newer; RTX 3050 Mobile qualifies.
+    powerManagement.enable            = true;
+    powerManagement.finegrained       = true;
+
+    # Use the proprietary driver — open kernel module is unstable on Ampere mobile.
+    open = false;
+
+    nvidiaSettings = true;
+
+    prime = {
+      offload = {
+        enable           = true;
+        # Generates the `nvidia-offload` wrapper script used in hyprland.nix
+        # and the nvidia-run alias in shell.nix.
+        enableOffloadCmd = true;
+      };
+      # Bus IDs confirmed via: sudo lspci | grep -E "VGA|3D"
+      # 01:00.0 → NVIDIA GeForce RTX 3050 Mobile
+      # 05:00.0 → AMD Radeon 680M (iGPU)
+      nvidiaBusId  = "PCI:1:0:0";
+      amdgpuBusId  = "PCI:5:0:0";
+    };
+  };
+
+  # Enable OpenGL / hardware acceleration
+  hardware.graphics = {
+    enable      = true;
+    enable32Bit = true;
+  };
+
+  # ── Display manager — SDDM ────────────────────────────────────────────────
+  # Qt6 build required for sddm-astronaut theme.
+  # qtmultimedia fixes "module QtMultimedia is not installed" on unstable/25.05
+  # (nixpkgs#390251).
+  services.displayManager.sddm = {
+    enable         = true;
+    wayland.enable = true;
+    package        = pkgs.kdePackages.sddm;
+    theme          = "sddm-astronaut-theme";
+    extraPackages  = [
+      pkgs.sddm-astronaut
+      pkgs.kdePackages.qtmultimedia
+    ];
     settings = {
       Theme.CursorTheme = "Bibata-Modern-Amber";
     };
   };
 
-  # Hyprland — packages come from the flake input to ensure version consistency
-  # with xdg-desktop-portal-hyprland (mixing versions causes portal failures)
+  # ── Hyprland ──────────────────────────────────────────────────────────────
+  # Packages come from the flake input to ensure version consistency
+  # with xdg-desktop-portal-hyprland (mixing versions causes portal failures).
   programs.hyprland = {
     enable        = true;
     package       = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
@@ -118,26 +156,26 @@
     extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
   };
 
-  # Audio via PipeWire
+  # ── Audio — PipeWire ──────────────────────────────────────────────────────
   security.rtkit.enable = true;
   services.pipewire = {
-    enable           = true;
-    alsa.enable      = true;
+    enable            = true;
+    alsa.enable       = true;
     alsa.support32Bit = true;
-    pulse.enable     = true;
-    jack.enable      = true;
+    pulse.enable      = true;
+    jack.enable       = true;
     wireplumber.enable = true;
   };
 
-  # Bluetooth
+  # ── Bluetooth ─────────────────────────────────────────────────────────────
   hardware.bluetooth = {
-    enable       = true;
-    powerOnBoot  = true;
+    enable      = true;
+    powerOnBoot = true;
     settings.General.Experimental = true;
   };
   services.blueman.enable = true;
 
-  # Touchpad via libinput
+  # ── Input — touchpad ──────────────────────────────────────────────────────
   services.libinput = {
     enable = true;
     touchpad = {
@@ -148,15 +186,16 @@
     };
   };
 
-  # Power management
-  # thermald is intentionally absent — conflicts with power-profiles-daemon on amd_pstate
+  # ── Power management ──────────────────────────────────────────────────────
+  # thermald is intentionally absent — conflicts with power-profiles-daemon
+  # on amd_pstate systems.
   services.power-profiles-daemon.enable = true;
   powerManagement = {
-    enable           = true;
-    cpuFreqGovernor  = lib.mkDefault "powersave";
+    enable          = true;
+    cpuFreqGovernor = lib.mkDefault "powersave";
   };
 
-  # User account
+  # ── User account ──────────────────────────────────────────────────────────
   users.users.ziad = {
     isNormalUser = true;
     description  = "Ziad Ali";
@@ -176,8 +215,9 @@
 
   security.sudo.wheelNeedsPassword = true;
 
-  # System packages — only packages that must be system-wide go here.
-  # User-specific tools live in home.packages in zizo.nix.
+  # ── System packages ───────────────────────────────────────────────────────
+  # Only packages that must be system-wide go here.
+  # User-specific tools live in home.packages in ziad.nix.
   environment.systemPackages = with pkgs; [
     # Core utilities
     git curl wget
@@ -202,7 +242,6 @@
     xwayland
     brightnessctl
     polkit_gnome
- #   rofi-power-menu
 
     # ASUS-specific utilities
     asusctl
@@ -229,11 +268,12 @@
     shared-mime-info
   ];
 
+  # ── Programs ──────────────────────────────────────────────────────────────
   programs = {
-    zsh.enable    = true;
-    dconf.enable  = true;
+    zsh.enable   = true;
+    dconf.enable = true;
     gnupg.agent = {
-      enable          = true;
+      enable           = true;
       enableSSHSupport = true;
     };
     thunar = {
@@ -245,7 +285,8 @@
     };
   };
 
-  # Docker — disabled on boot to avoid unnecessary startup overhead
+  # ── Virtualisation ────────────────────────────────────────────────────────
+  # Docker disabled on boot to avoid unnecessary startup overhead.
   virtualisation.docker = {
     enable       = true;
     enableOnBoot = false;
@@ -258,8 +299,7 @@
     };
   };
 
-  # Stylix — system-wide Gruvbox Dark Hard theming
-  # The closing brace for fetchurl was missing in the original; fixed here.
+  # ── Stylix — system-wide Gruvbox Dark Hard theming ────────────────────────
   stylix = {
     enable = true;
     image  = if builtins.pathExists ./wallpaper.jpg
@@ -297,7 +337,7 @@
     };
   };
 
-  # PostgreSQL — local development instance
+  # ── PostgreSQL — local development instance ───────────────────────────────
   services.postgresql = {
     enable  = true;
     package = pkgs.postgresql_16;
@@ -325,10 +365,10 @@
     '';
   };
 
-  # System services
+  # ── System services ───────────────────────────────────────────────────────
   services = {
-    gvfs.enable    = true;
-    tumbler.enable = true;
+    gvfs.enable     = true;
+    tumbler.enable  = true;
     printing.enable = true;
     avahi = {
       enable   = true;
