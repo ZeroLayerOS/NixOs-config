@@ -32,6 +32,7 @@
       bat          # syntax-highlighted cat
      #fd           # fast find alternative
      # ripgrep      # fast grep alternative
+      wofi-power-menu
       fzf          # fuzzy finder
       zoxide       # smarter directory jumping
       delta        # better git diff pager
