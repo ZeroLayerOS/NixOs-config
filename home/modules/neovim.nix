@@ -18,7 +18,7 @@
     # lazy.nvim is also provided by Nix — no git clone at runtime.
     extraPackages = with pkgs; [
       # lazy.nvim — loaded via Nix, not git clone
-      vimPlugins.lazy-nvim
+    #  vimPlugins.lazy-nvim
 
       # LSP servers
       rust-analyzer
