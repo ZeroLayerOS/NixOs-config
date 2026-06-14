@@ -8,7 +8,7 @@
     enableCompletion         = true;
     autosuggestion.enable    = true;
     syntaxHighlighting.enable = true;
-    dotDir                   = ".config/zsh";
+    dotDir                   =  "${config.xdg.configHome}/zsh";
 
     history = {
       size        = 50000;
@@ -181,7 +181,7 @@
       ccl = "cargo clippy";
     };
 
-    initExtra = ''
+    initContent = ''
       # Powerlevel10k instant prompt — must be sourced before anything else
       if [[ -r "''${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-''${(%):-%n}.zsh" ]]; then
         source "''${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-''${(%):-%n}.zsh"

@@ -6,6 +6,7 @@
 {
   programs.neovim = {
     enable        = true;
+    withRuby    = false;
     defaultEditor = true;
     viAlias       = true;
     vimAlias      = true;
@@ -47,7 +48,7 @@
       gcc
     ];
 
-    extraLuaConfig = ''
+    initLua= ''
       -- ── Bootstrap ────────────────────────────────────────────────────────
       -- lazy.nvim is provided by Nix — no git clone needed.
       -- ${pkgs.vimPlugins.lazy-nvim} is the Nix store path.

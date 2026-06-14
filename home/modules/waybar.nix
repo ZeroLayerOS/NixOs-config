@@ -10,7 +10,7 @@
       enable = true;
       # Ensure waybar only starts after the Hyprland session is fully active,
       # preventing a race condition on login.
-      target = "hyprland-session.target";
+      targets = ["hyprland-session.target"];
     };
 
     settings = [{

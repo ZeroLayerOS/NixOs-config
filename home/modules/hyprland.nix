@@ -6,6 +6,7 @@
 {
   wayland.windowManager.hyprland = {
     enable = true;
+    configType = "hyprlang";
 
     # Setting both to null defers to the packages declared in programs.hyprland
     # (configuration.nix), preventing version mismatches between the NixOS module

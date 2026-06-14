@@ -10,16 +10,16 @@
     ./modules/ghostty.nix
     ./modules/neovim.nix
     ./modules/shell.nix
-    # rofi.nix is superseded by programs.rofi below; kept for reference
+    # rofi.nix is superseded by programs.wofi below; kept for reference
     # ./modules/rofi.nix
   ];
 
+  # ── Home ──────────────────────────────────────────────────────────────────
   home = {
-    username     = "ziad";
+    username      = "ziad";
     homeDirectory = "/home/ziad";
     stateVersion  = "25.05";
 
-    # Preferred over sessionVariables.PATH — evaluated after profile sources
     sessionPath = [
       "${config.home.homeDirectory}/.cargo/bin"
       "${config.home.homeDirectory}/.local/bin"
@@ -28,37 +28,37 @@
     packages = with pkgs; [
       # Terminal utilities
       fastfetch
-      eza          # modern ls replacement
-      bat          # syntax-highlighted cat
-     #fd           # fast find alternative
-     # ripgrep      # fast grep alternative
-      wofi-power-menu
-      fzf          # fuzzy finder
-      zoxide       # smarter directory jumping
-      delta        # better git diff pager
-      lazygit      # git TUI
-      yazi         # terminal file manager
-      bottom       # system resource monitor
-      dust         # disk usage analyser
-      tokei        # code statistics
-      procs        # modern ps replacement (aliased in shell.nix)
-      okular
+      eza
+      bat
+      #fd
+      #ripgrep
+      fzf
+      zoxide
+      delta
+      lazygit
+      yazi
+      bottom
+      dust
+      tokei
+      procs
+
       # Wayland / Hyprland ecosystem
-     # rofi-wayland
-      swww             # animated wallpaper daemon
-      grimblast        # Hyprland-native screenshot tool
-      slurp            # screen area selection
-      wf-recorder      # screen recording
-      hyprpicker       # colour picker
+      awww             # animated wallpaper daemon (renamed from swww)
+      wofi-power-menu  # power menu for waybar
+      grimblast
+      slurp
+      wf-recorder
+      hyprpicker
 
       # GTK / theming
-      nwg-look         # GTK settings GUI
+      nwg-look
 
       # Applications
       zed-editor
       inputs.zen-browser.packages.${pkgs.system}.default
       pavucontrol
       blueman
+      kdePackages.okular
 
       # Development toolchain
       #gcc
@@ -79,16 +79,15 @@
     ];
   };
 
-  # Disable Stylix auto-management for GTK and cursor.
-  # GTK is handled manually below with gruvbox-gtk-theme.
-  # Cursor is managed by gtk.cursorTheme to avoid a double-definition conflict.
+  # ── Stylix ────────────────────────────────────────────────────────────────
   stylix.targets.gtk.enable      = false;
-#  stylix.targets.cursor.enable   = false;
+  # stylix.targets.cursor.enable = false;
   stylix.targets.hyprland.enable = false;
 
-  # GTK theming — Gruvbox Dark BL variant
+  # ── GTK theming ───────────────────────────────────────────────────────────
   gtk = {
     enable = true;
+   
     theme = {
       name    = "Gruvbox-Dark-BL";
       package = pkgs.gruvbox-gtk-theme;
@@ -104,20 +103,22 @@
     };
     gtk3.extraConfig.gtk-application-prefer-dark-theme = 1;
     gtk4.extraConfig.gtk-application-prefer-dark-theme = 1;
+    gtk4.theme = config.gtk.theme;
   };
 
+  # ── Qt ────────────────────────────────────────────────────────────────────
   qt = {
-    enable = true;
-    platformTheme.name = "gtk";
-
+    enable             = true;
+    platformTheme.name = lib.mkForce "gtk";
   };
 
-  # XDG directories and MIME associations
+  # ── XDG ───────────────────────────────────────────────────────────────────
   xdg = {
     enable = true;
     userDirs = {
-      enable            = true;
-      createDirectories = true;
+      enable              = true;
+      createDirectories   = true;
+      setSessionVariables = true;
       desktop   = "${config.home.homeDirectory}/Desktop";
       documents = "${config.home.homeDirectory}/Documents";
       download  = "${config.home.homeDirectory}/Downloads";
@@ -129,7 +130,6 @@
     mimeApps = {
       enable = true;
       defaultApplications = {
-        # zen-browser flake installs the desktop file as "zen.desktop"
         "text/html"              = "zen.desktop";
         "x-scheme-handler/http"  = "zen.desktop";
         "x-scheme-handler/https" = "zen.desktop";
@@ -143,11 +143,14 @@
     };
   };
 
+  # ── Git ───────────────────────────────────────────────────────────────────
   programs.git = {
-    enable    = true;
-    userName  = "Ziad Ali";
-    userEmail = "zalshemy9@gmail.com";
-    extraConfig = {
+    enable = true;
+    settings = {
+      user = {
+        name  = "Ziad Ali";
+        email = "zalshemy9@gmail.com";
+      };
       init.defaultBranch  = "main";
       pull.rebase         = true;
       protocol.version    = 2;
@@ -163,22 +166,28 @@
         line-numbers = true;
         syntax-theme = "gruvbox-dark";
       };
-      "protocol \"ipv4\"".allow          = "always";
+      "protocol \"ipv4\"".allow               = "always";
       "url \"https://github.com/\"".insteadOf = "git://github.com/";
     };
   };
 
+  # ── SSH ───────────────────────────────────────────────────────────────────
   programs.ssh = {
-    enable          = true;
-    addKeysToAgent  = "yes";
-    matchBlocks."github.com" = {
-      hostname     = "github.com";
-      user         = "git";
-      identityFile = "~/.ssh/id_ed25519";
+    enable                = true;
+    enableDefaultConfig   = false;
+    settings = {
+      "*" = {
+        AddKeysToAgent = "yes";
+      };
+      "github.com" = {
+        Hostname     = "github.com";
+        User         = "git";
+        IdentityFile = "~/.ssh/id_ed25519";
+      };
     };
   };
 
-  # Services
+  # ── Services ──────────────────────────────────────────────────────────────
   services = {
     dunst = {
       enable = true;
@@ -199,12 +208,8 @@
       };
     };
 
-    # Clipboard history manager
     cliphist.enable = true;
 
-    # Idle management — hypridle is the native Hyprland idle daemon.
-    # "hypridle" is intentionally absent from exec-once in hyprland.nix;
-    # this systemd service handles startup instead.
     hypridle = {
       enable = true;
       settings = {
@@ -218,7 +223,7 @@
             on-timeout = "hyprlock";
           }
           {
-            timeout   = 600;
+            timeout    = 600;
             on-timeout = "hyprctl dispatch dpms off";
             on-resume  = "hyprctl dispatch dpms on";
           }
@@ -227,33 +232,20 @@
     };
   };
 
-  # Rofi launcher — single authoritative definition here.
-  # rofi.nix is kept in modules/ for reference but NOT imported above.
-#  programs.rofi = {
- #   enable = true;
-  #  package = pkgs.rofi-wayland;
-   # terminal = "${pkgs.ghostty}/bin/ghostty";
-    #theme = "gruvbox-dark-hard";
-    #extraConfig = {
-     # modi       = "run,drun,window";
-      #show-icons = true;
-    #};
-  #};
+  # ── Wofi launcher ─────────────────────────────────────────────────────────
   programs.wofi = {
-  enable = true;
-  settings = {
-    width         = 600;
-    height        = 400;
-    #terminal      = "${pkgs.ghostty}/bin/ghostty";
-    show          = "drun";
-    insensitive   = true;
-    prompt        = "Search...";
-    allow_markup  = true;
-    allow_images  = true;
+    enable = true;
+    settings = {
+      width        = 600;
+      height       = 400;
+      show         = "drun";
+      insensitive  = true;
+      prompt       = "Search...";
+      allow_markup = true;
+      allow_images = true;
+    };
   };
-};
 
-  fonts.fontconfig.enable = true;
-
+  fonts.fontconfig.enable  = true;
   programs.home-manager.enable = true;
 }
