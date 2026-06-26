@@ -109,7 +109,7 @@
   # ── Qt ────────────────────────────────────────────────────────────────────
   qt = {
     enable             = true;
-    platformTheme.name = lib.mkForce "gtk";
+    platformTheme.name = lib.mkForce "gtk3";
   };
 
   # ── XDG ───────────────────────────────────────────────────────────────────
