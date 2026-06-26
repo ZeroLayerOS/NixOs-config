@@ -8,7 +8,7 @@ Welcome to my personal, flake-based NixOS configuration. This setup is fully mod
 
 ## 📁 Repository Structure
 
-The project follows a standard Nix flake directory layout:
+The project follows a modular Nix flake directory layout:
 
 ```text
 nixos-config
@@ -16,9 +16,10 @@ nixos-config
 ├── README.md                  # This documentation file
 ├── hosts/
 │   └── default/
-│       └── configuration.nix  # System-level settings, hardware imports, and core config
+│       └── configuration.nix  # System-level settings and core configuration
 └── home/
-    ├── zizo.nix               # User-specific Home Manager profile configuration
+    ├── colorScheme.nix        # Centralized theme specification to easily swap color schemes globally
+    ├── ziad.nix               # Main user profile configuration importing modular packages
     └── modules/               # Modular standalone configurations for apps & environment
         ├── ghoststy.nix       # Ghostty terminal emulator styling & configuration
         ├── hyprland.nix       # Hyprland tiling window manager settings & keybinds
