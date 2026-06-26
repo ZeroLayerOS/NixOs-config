@@ -30,6 +30,7 @@
       fastfetch
       eza
       bat
+      uv
       #fd
       #ripgrep
       fzf
