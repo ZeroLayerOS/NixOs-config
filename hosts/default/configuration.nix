@@ -276,13 +276,15 @@
       enable           = true;
       enableSSHSupport = true;
     };
-    thunar = {
-      enable  = true;
-      plugins = with pkgs.xfce; [
-        thunar-archive-plugin
-        thunar-volman
-      ];
-    };
+     nautilus
+     nautilus-open-any-terminal
+   # thunar = {
+   #   enable  = true;
+   #   plugins = with pkgs.xfce; [
+   #     thunar-archive-plugin
+   #     thunar-volman
+   #   ];
+   # };
   };
 
   # ── Virtualisation ────────────────────────────────────────────────────────

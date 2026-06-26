@@ -160,7 +160,7 @@
 
         "size 700 500, class:^(pavucontrol)$"
 
-        "opacity 0.9 0.85, class:^(Thunar)$"
+        "opacity 0.9 0.85, class:^(org.gnome.Nautilus)$"
 
         "workspace 1, class:^(com.mitchellh.ghostty)$"
         # zen-browser flake exposes the binary/WM_CLASS as "zen"
@@ -168,7 +168,7 @@
         "workspace 3, class:^(zeditor)$"
         "workspace 3, class:^(nvim)$"
         "workspace 4, class:^(obsidian)$"
-        "workspace 5, class:^(thunar)$"
+        "workspace 5, class:^(org.gnome.Nautilus)$"
         "workspace 9, class:^(steam)$"
         "workspace 9, class:^(gamescope)$"
       ];
@@ -188,7 +188,7 @@
       "$browser"  = "zen";
       "$editor"   = "zeditor";
       "$launcher" = "wofi --show drun";
-      "$files"    = "thunar";
+      "$files"    = "nautilus";
 
       bind = [
         "$mod, Return,    exec, $terminal"

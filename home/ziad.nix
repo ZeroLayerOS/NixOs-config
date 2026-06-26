@@ -136,7 +136,7 @@
         "image/jpeg"             = "imv.desktop";
         "image/png"              = "imv.desktop";
         "video/mp4"              = "mpv.desktop";
-        "inode/directory"        = "thunar.desktop";
+        "inode/directory" = "org.gnome.Nautilus.desktop";
         "application/pdf"        = "okular.desktop";
         "application/x-pdf"      = "okular.desktop";
       };
