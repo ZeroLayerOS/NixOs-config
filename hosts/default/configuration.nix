@@ -226,7 +226,9 @@
     htop btop
     lsof pciutils usbutils
     nvme-cli
-
+    # File mamanger 
+    nautilus
+    nautilus-open-any-terminal
     # GPU diagnostics
     nvtopPackages.full
     radeontop
@@ -276,8 +278,8 @@
       enable           = true;
       enableSSHSupport = true;
     };
-     nautilus
-     nautilus-open-any-terminal
+   #   nautilus
+   # nautilus-open-any-terminal
    # thunar = {
    #   enable  = true;
    #   plugins = with pkgs.xfce; [
