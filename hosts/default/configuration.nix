@@ -306,8 +306,8 @@
   # ── Stylix — system-wide Gruvbox Dark Hard theming ────────────────────────
   stylix = {
     enable = true;
-    image  = if builtins.pathExists ./wallpaper.jpg
-             then ./wallpaper.jpg
+    image  = if builtins.pathExists ./wallhaven-3lyrvy.png
+             then ./wallhaven-3lyrvy.png
              else builtins.fetchurl {
                url    = "https://raw.githubusercontent.com/NixOS/nixos-artwork/master/wallpapers/nix-wallpaper-dracula.png";
                sha256 = "sha256:07ly21bhs6cgfl7pv4xlqzdqm44h22frwfhdqyd4gkn2jla1waab";
