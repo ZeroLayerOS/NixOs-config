@@ -3,6 +3,9 @@
 
 { config, pkgs, inputs, lib, ... }:
 
+let
+  colors = import ../colorScheme.nix;
+in
 {
   wayland.windowManager.hyprland = {
     enable = true;
@@ -21,7 +24,6 @@
     systemd.variables = [ "--all" ];
 
     settings = {
-
       monitor = [
         "eDP-1,1920x1080@144,0x0,1"
         ",preferred,auto,1"
@@ -46,14 +48,14 @@
 
       exec-once = [
         "swww-daemon && swww img ~/.config/hypr/wallpaper.jpg --transition-type wipe"
-        
+
         # waybar  — started by systemd via programs.waybar.systemd.enable
         # dunst   — started by systemd via services.dunst.enable
         # hypridle — started by systemd via services.hypridle.enable
         #            (do NOT also exec-once hypridle; that would run two instances)
         "nm-applet --indicator"
         "blueman-applet"
-        # cliphist pipe — handled by services.cliphist.enable in zizo.nix
+        # cliphist pipe — handled by services.cliphist.enable in ziad.nix
         "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1"
         "hyprctl setcursor Bibata-Modern-Amber 24"
       ];
@@ -75,8 +77,9 @@
         gaps_in  = 5;
         gaps_out = 10;
         border_size = 2;
-        "col.active_border"   = "rgba(d79921ff) rgba(b57614ff) 45deg";
-        "col.inactive_border" = "rgba(3c3836aa)";
+        # Colours from colorScheme.nix — edit there, not here.
+        "col.active_border"   = "rgba(${colors.yellow}ff) rgba(${colors.orange}ff) 45deg";
+        "col.inactive_border" = "rgba(${colors.bg1}aa)";
         layout        = "dwindle";
         allow_tearing = false;
       };
@@ -95,7 +98,7 @@
           enabled      = true;
           range        = 15;
           render_power = 3;
-          color        = "rgba(00000080)";
+          color        = "rgba(${colors.bg0_hard}80)";
         };
         inactive_opacity = 0.93;
         active_opacity   = 1.0;
@@ -174,13 +177,14 @@
       ];
 
       layerrule = [
-      "blur,       waybar"
-      "ignorezero, waybar"
-      "blur,       wofi"
-      "ignorezero, wofi"
-      "blur,       dunst"
-      "ignorezero, dunst"
-    ];
+        "blur,       waybar"
+        "ignorezero, waybar"
+        "blur,       wofi"
+        "ignorezero, wofi"
+        "blur,       dunst"
+        "ignorezero, dunst"
+      ];
+
       "$mod"      = "SUPER";
       "$terminal" = "ghostty";
       # zen-browser flake installs the binary as "zen"; verify with:
@@ -211,10 +215,20 @@
         "$mod, K,         movefocus, u"
         "$mod, J,         movefocus, d"
 
+        "$mod, left,      movefocus, l"
+        "$mod, right,     movefocus, r"
+        "$mod, up,        movefocus, u"
+        "$mod, down,      movefocus, d"
+
         "$mod SHIFT, H,   movewindow, l"
         "$mod SHIFT, L,   movewindow, r"
         "$mod SHIFT, K,   movewindow, u"
         "$mod SHIFT, J,   movewindow, d"
+
+        "$mod SHIFT, left,  movewindow, l"
+        "$mod SHIFT, right, movewindow, r"
+        "$mod SHIFT, up,    movewindow, u"
+        "$mod SHIFT, down,  movewindow, d"
 
         "$mod, 1, workspace, 1"
         "$mod, 2, workspace, 2"
@@ -259,6 +273,11 @@
         "$mod ALT, K, resizeactive,  0 -30"
         "$mod ALT, J, resizeactive,  0  30"
 
+        "$mod ALT, left,  resizeactive, -30 0"
+        "$mod ALT, right, resizeactive,  30 0"
+        "$mod ALT, up,    resizeactive,  0 -30"
+        "$mod ALT, down,  resizeactive,  0  30"
+
         ", XF86AudioRaiseVolume,  exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+"
         ", XF86AudioLowerVolume,  exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"
         ", XF86AudioMute,         exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
@@ -295,9 +314,9 @@
         monitor           = "";
         size              = "250, 50";
         outline_thickness = 2;
-        outer_color       = "rgb(d79921)";
-        inner_color       = "rgb(1d2021)";
-        font_color        = "rgb(ebdbb2)";
+        outer_color       = "rgb(${colors.yellow})";
+        inner_color       = "rgb(${colors.bg0_hard})";
+        font_color        = "rgb(${colors.fg})";
         placeholder_text  = "<i>Password...</i>";
         position          = "0, -100";
         halign            = "center";

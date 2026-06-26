@@ -3,6 +3,9 @@
 
 { config, pkgs, lib, ... }:
 
+let
+  colors = import ../colorScheme.nix;
+in
 {
   programs.waybar = {
     enable = true;
@@ -10,7 +13,7 @@
       enable = true;
       # Ensure waybar only starts after the Hyprland session is fully active,
       # preventing a race condition on login.
-      targets = ["hyprland-session.target"];
+      targets = [ "hyprland-session.target" ];
     };
 
     settings = [{
@@ -78,12 +81,13 @@
           mode-mon-col = 3;
           weeks-pos    = "right";
           on-scroll    = 1;
+          # Calendar colours come from colorScheme.nix
           format = {
-            months   = "<span color='#d79921'><b>{}</b></span>";
-            days     = "<span color='#ebdbb2'>{}</span>";
-            weeks    = "<span color='#689d6a'><b>W{}</b></span>";
-            weekdays = "<span color='#b8bb26'><b>{}</b></span>";
-            today    = "<span color='#fb4934'><b><u>{}</u></b></span>";
+            months   = "<span color='#${colors.yellow}'><b>{}</b></span>";
+            days     = "<span color='#${colors.fg}'>{}</span>";
+            weeks    = "<span color='#${colors.cyan}'><b>W{}</b></span>";
+            weekdays = "<span color='#${colors.bright_green}'><b>{}</b></span>";
+            today    = "<span color='#${colors.bright_red}'><b><u>{}</u></b></span>";
           };
         };
         actions = {
@@ -174,24 +178,25 @@
       "custom/power" = {
         format   = "󰐥";
         tooltip  = false;
-        on-click = "wofi-power-menu" ;
+        on-click = "wofi-power-menu";
       };
     }];
 
+    # All colours below come from colorScheme.nix — edit colours there, not here.
     style = ''
-      @define-color bg-hard  #1d2021;
-      @define-color bg       #282828;
-      @define-color bg1      #3c3836;
-      @define-color bg2      #504945;
-      @define-color fg       #ebdbb2;
-      @define-color fg2      #d5c4a1;
-      @define-color yellow   #d79921;
-      @define-color orange   #d65d0e;
-      @define-color red      #cc241d;
-      @define-color green    #98971a;
-      @define-color aqua     #689d6a;
-      @define-color blue     #458588;
-      @define-color purple   #b16286;
+      @define-color bg-hard  #${colors.bg0_hard};
+      @define-color bg       #${colors.bg0};
+      @define-color bg1      #${colors.bg1};
+      @define-color bg2      #${colors.bg2};
+      @define-color fg       #${colors.fg};
+      @define-color fg2      #${colors.fg2};
+      @define-color yellow   #${colors.yellow};
+      @define-color orange   #${colors.orange};
+      @define-color red      #${colors.red};
+      @define-color green    #${colors.green};
+      @define-color aqua     #${colors.cyan};
+      @define-color blue     #${colors.blue};
+      @define-color purple   #${colors.magenta};
 
       * {
         font-family: "JetBrainsMono Nerd Font", "Font Awesome 6 Free";

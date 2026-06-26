@@ -3,6 +3,9 @@
 
 { config, pkgs, lib, ... }:
 
+let
+  colors = import ../colorScheme.nix;
+in
 {
   programs.ghostty = {
     enable               = true;
@@ -34,8 +37,6 @@
       scrollback-limit = 10000;
 
       # ── Shell integration ─────────────────────────────────────────────────
-      # enableZshIntegration above handles sourcing; these options tune what
-      # the integration exposes (cursor shape, sudo wrapper, title tracking).
       shell-integration          = "zsh";
       shell-integration-features = "cursor,sudo,title";
 
@@ -45,9 +46,6 @@
       confirm-close-surface   = false;
 
       # ── Keybindings ───────────────────────────────────────────────────────
-      # CTRL-A leader mirrors the WezTerm/tmux mental model.
-      # keybind belongs inside settings — it is a Ghostty config key,
-      # not a Home Manager module attribute.
       keybind = [
         # Tabs
         "ctrl+a>c=new_tab"
@@ -90,32 +88,31 @@
 
     # ── Custom Gruvbox Dark Hard colour theme ────────────────────────────────
     # Ghostty's built-in "GruvboxDark" is the *soft* variant.
-    # This block overrides it with the Hard variant (#1d2021 background)
-    # so every tool in the stack uses the same base colour.
+    # Values come from colorScheme.nix — edit colours there, not here.
     themes.GruvboxDark = {
-      background           = "1d2021";
-      foreground           = "ebdbb2";
-      cursor-color         = "d79921";
-      selection-background = "504945";
-      selection-foreground = "ebdbb2";
+      background           = colors.bg0_hard;
+      foreground            = colors.fg;
+      cursor-color          = colors.cursor;
+      selection-background  = colors.selection_bg;
+      selection-foreground  = colors.selection_fg;
 
       palette = [
-        "0=#282828"   # black
-        "1=#cc241d"   # red
-        "2=#98971a"   # green
-        "3=#d79921"   # yellow
-        "4=#458588"   # blue
-        "5=#b16286"   # magenta
-        "6=#689d6a"   # cyan
-        "7=#a89984"   # white
-        "8=#928374"   # bright black
-        "9=#fb4934"   # bright red
-        "10=#b8bb26"  # bright green
-        "11=#fabd2f"  # bright yellow
-        "12=#83a598"  # bright blue
-        "13=#d3869b"  # bright magenta
-        "14=#8ec07c"  # bright cyan
-        "15=#ebdbb2"  # bright white
+        "0=#${colors.bg0}"             # black
+        "1=#${colors.red}"             # red
+        "2=#${colors.green}"           # green
+        "3=#${colors.yellow}"          # yellow
+        "4=#${colors.blue}"            # blue
+        "5=#${colors.magenta}"         # magenta
+        "6=#${colors.cyan}"            # cyan
+        "7=#${colors.fg4}"             # white
+        "8=#${colors.bg4}"             # bright black
+        "9=#${colors.bright_red}"      # bright red
+        "10=#${colors.bright_green}"   # bright green
+        "11=#${colors.bright_yellow}"  # bright yellow
+        "12=#${colors.bright_blue}"    # bright blue
+        "13=#${colors.bright_magenta}" # bright magenta
+        "14=#${colors.bright_cyan}"    # bright cyan
+        "15=#${colors.fg}"             # bright white
       ];
     };
   };
