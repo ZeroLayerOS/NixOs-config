@@ -9,297 +9,286 @@ in
 {
   wayland.windowManager.hyprland = {
     enable = true;
+    #  configType = "lua";
+
     configType = "hyprlang";
 
+    extraConfig = ''
+      # Legacy source stub. Main config is handled standalone in hyprland.lua below.
+    '';
     # Setting both to null defers to the packages declared in programs.hyprland
-    # (configuration.nix), preventing version mismatches between the NixOS module
-    # and the Home Manager module.
     package       = null;
     portalPackage = null;
 
     xwayland.enable = true;
 
-    # Export all session variables to systemd/D-Bus so that user services
-    # (hypridle, waybar, dunst) have a complete environment.
+    # Export all session variables to systemd/D-Bus
     systemd.variables = [ "--all" ];
-
-    settings = {
-      monitor = [
-        "eDP-1,1920x1080@144,0x0,1"
-        ",preferred,auto,1"
-      ];
-
-      env = [
-        "LIBVA_DRIVER_NAME,radeonsi"
-        "GBM_BACKEND,amdgpu"
-        "__GLX_VENDOR_LIBRARY_NAME,mesa"
-        "XCURSOR_THEME,Bibata-Modern-Amber"
-        "XCURSOR_SIZE,24"
-        "QT_QPA_PLATFORM,wayland"
-        "QT_WAYLAND_DISABLE_WINDOWDECORATION,1"
-        "GDK_BACKEND,wayland,x11"
-        "SDL_VIDEODRIVER,wayland"
-        "MOZ_ENABLE_WAYLAND,1"
-        "ELECTRON_OZONE_PLATFORM_HINT,wayland"
-        "XDG_SESSION_TYPE,wayland"
-        "XDG_CURRENT_DESKTOP,Hyprland"
-        "XDG_SESSION_DESKTOP,Hyprland"
-      ];
-
-      exec-once = [
-        "swww-daemon && swww img ~/.config/hypr/wallpaper.jpg --transition-type wipe"
-
-        # waybar  — started by systemd via programs.waybar.systemd.enable
-        # dunst   — started by systemd via services.dunst.enable
-        # hypridle — started by systemd via services.hypridle.enable
-        #            (do NOT also exec-once hypridle; that would run two instances)
-        "nm-applet --indicator"
-        "blueman-applet"
-        # cliphist pipe — handled by services.cliphist.enable in ziad.nix
-        "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1"
-        "hyprctl setcursor Bibata-Modern-Amber 24"
-      ];
-
-      input = {
-        kb_layout  = "us,ara";
-        kb_options = "grp:alt_shift_toggle";
-        follow_mouse = 1;
-        sensitivity  = 0;
-        touchpad = {
-          natural_scroll = true;
-          tap-to-click   = true;
-          drag_lock      = true;
-          scroll_factor  = 0.8;
-        };
-      };
-
-      general = {
-        gaps_in  = 5;
-        gaps_out = 10;
-        border_size = 2;
-        # Colours from colorScheme.nix — edit there, not here.
-        "col.active_border"   = "rgba(${colors.yellow}ff) rgba(${colors.orange}ff) 45deg";
-        "col.inactive_border" = "rgba(${colors.bg1}aa)";
-        layout        = "dwindle";
-        allow_tearing = false;
-      };
-
-      decoration = {
-        rounding = 8;
-        blur = {
-          enabled           = true;
-          size              = 4;
-          passes            = 2;
-          new_optimizations = true;
-          ignore_opacity    = true;
-          xray              = false;
-        };
-        shadow = {
-          enabled      = true;
-          range        = 15;
-          render_power = 3;
-          color        = "rgba(${colors.bg0_hard}80)";
-        };
-        inactive_opacity = 0.93;
-        active_opacity   = 1.0;
-      };
-
-      animations = {
-        enabled = true;
-        bezier = [
-          "smooth,   0.05, 0.9,  0.1,  1.05"
-          "snappy,   0.25, 1,    0.5,  1"
-          "overshot, 0.13, 0.99, 0.29, 1.1"
-          "linear,   0,    0,    1,    1"
-        ];
-        animation = [
-          "windows,          1, 5,  smooth,  slide"
-          "windowsOut,       1, 4,  snappy,  popin 80%"
-          "windowsMove,      1, 4,  smooth"
-          "border,           1, 10, default"
-          "borderangle,      1, 8,  linear,  loop"
-          "fade,             1, 7,  default"
-          "workspaces,       1, 5,  overshot, slide"
-          "specialWorkspace, 1, 6,  smooth,  slidevert"
-        ];
-      };
-
-      dwindle = {
-        pseudotile     = true;
-        preserve_split = true;
-        smart_split    = true;
-      };
-
-      master = {
-        new_status = "master";
-      };
-
-      gestures = {
-        workspace_swipe          = true;
-        workspace_swipe_fingers  = 3;
-        workspace_swipe_distance = 300;
-        workspace_swipe_cancel_ratio = 0.2;
-      };
-
-      misc = {
-        force_default_wallpaper = 0;
-        disable_hyprland_logo   = true;
-        animate_manual_resizes  = true;
-        enable_swallow          = true;
-        swallow_regex           = "^(ghostty|foot)$";
-        vfr                     = true;
-      };
-
-      windowrulev2 = [
-        "float, class:^(pavucontrol)$"
-        "float, class:^(blueman-manager)$"
-        "float, class:^(nm-connection-editor)$"
-        "float, class:^(imv)$"
-        "float, title:^(Picture-in-Picture)$"
-        "float, class:^(nwg-look)$"
-
-        "center, class:^(pavucontrol)$"
-        "center, class:^(blueman-manager)$"
-
-        "size 700 500, class:^(pavucontrol)$"
-
-        "opacity 0.9 0.85, class:^(org.gnome.Nautilus)$"
-
-        "workspace 1, class:^(com.mitchellh.ghostty)$"
-        # zen-browser flake exposes the binary/WM_CLASS as "zen"
-        "workspace 2, class:^(zen)$"
-        "workspace 3, class:^(zeditor)$"
-        "workspace 3, class:^(nvim)$"
-        "workspace 4, class:^(obsidian)$"
-        "workspace 5, class:^(org.gnome.Nautilus)$"
-        "workspace 9, class:^(steam)$"
-        "workspace 9, class:^(gamescope)$"
-      ];
-
-      layerrule = [
-        "blur,       waybar"
-        "ignorezero, waybar"
-        "blur,       wofi"
-        "ignorezero, wofi"
-        "blur,       dunst"
-        "ignorezero, dunst"
-      ];
-
-      "$mod"      = "SUPER";
-      "$terminal" = "ghostty";
-      # zen-browser flake installs the binary as "zen"; verify with:
-      # ls $(nix build inputs#zen-browser...)/bin/
-      "$browser"  = "zen";
-      "$editor"   = "zeditor";
-      "$launcher" = "wofi --show drun";
-      "$files"    = "nautilus";
-
-      bind = [
-        "$mod, Return,    exec, $terminal"
-        "$mod, B,         exec, $browser"
-        "$mod, E,         exec, $editor"
-        "$mod, F,         exec, $files"
-        "$mod, Space,     exec, $launcher"
-        "$mod SHIFT, C,   killactive,"
-        "$mod SHIFT, M,   exit,"
-        "$mod, V,         exec, cliphist list | wofi --dmenu | cliphist decode | wl-copy"
-
-        "$mod, T,         togglefloating,"
-        "$mod, P,         pseudo,"
-        "$mod, o,         togglesplit,"
-        "$mod, F11,       fullscreen, 0"
-        "$mod SHIFT, F,   fullscreen, 1"
-
-        "$mod, H,         movefocus, l"
-        "$mod, L,         movefocus, r"
-        "$mod, K,         movefocus, u"
-        "$mod, J,         movefocus, d"
-
-        "$mod, left,      movefocus, l"
-        "$mod, right,     movefocus, r"
-        "$mod, up,        movefocus, u"
-        "$mod, down,      movefocus, d"
-
-        "$mod SHIFT, H,   movewindow, l"
-        "$mod SHIFT, L,   movewindow, r"
-        "$mod SHIFT, K,   movewindow, u"
-        "$mod SHIFT, J,   movewindow, d"
-
-        "$mod SHIFT, left,  movewindow, l"
-        "$mod SHIFT, right, movewindow, r"
-        "$mod SHIFT, up,    movewindow, u"
-        "$mod SHIFT, down,  movewindow, d"
-
-        "$mod, 1, workspace, 1"
-        "$mod, 2, workspace, 2"
-        "$mod, 3, workspace, 3"
-        "$mod, 4, workspace, 4"
-        "$mod, 5, workspace, 5"
-        "$mod, 6, workspace, 6"
-        "$mod, 7, workspace, 7"
-        "$mod, 8, workspace, 8"
-        "$mod, 9, workspace, 9"
-        "$mod, 0, workspace, 10"
-
-        "$mod SHIFT, 1, movetoworkspace, 1"
-        "$mod SHIFT, 2, movetoworkspace, 2"
-        "$mod SHIFT, 3, movetoworkspace, 3"
-        "$mod SHIFT, 4, movetoworkspace, 4"
-        "$mod SHIFT, 5, movetoworkspace, 5"
-        "$mod SHIFT, 6, movetoworkspace, 6"
-        "$mod SHIFT, 7, movetoworkspace, 7"
-        "$mod SHIFT, 8, movetoworkspace, 8"
-        "$mod SHIFT, 9, movetoworkspace, 9"
-        "$mod SHIFT, 0, movetoworkspace, 10"
-
-        "$mod, S,         togglespecialworkspace, magic"
-        "$mod SHIFT, S,   movetoworkspace, special:magic"
-
-        "$mod, mouse_down, workspace, e+1"
-        "$mod, mouse_up,   workspace, e-1"
-
-        ",      Print,   exec, grimblast copy area"
-        "SHIFT, Print,   exec, grimblast copy output"
-        "$mod,  Print,   exec, grimblast save area ~/Pictures/Screenshots/$(date +%Y%m%d_%H%M%S).png"
-
-        "$mod, Backspace, exec, hyprlock"
-        "$mod, C,         exec, hyprpicker -a"
-        "$mod SHIFT, W,   exec, swww img $(find ~/Pictures/Wallpapers -type f | shuf -n1) --transition-type wipe"
-      ];
-
-      binde = [
-        "$mod ALT, H, resizeactive, -30 0"
-        "$mod ALT, L, resizeactive,  30 0"
-        "$mod ALT, K, resizeactive,  0 -30"
-        "$mod ALT, J, resizeactive,  0  30"
-
-        "$mod ALT, left,  resizeactive, -30 0"
-        "$mod ALT, right, resizeactive,  30 0"
-        "$mod ALT, up,    resizeactive,  0 -30"
-        "$mod ALT, down,  resizeactive,  0  30"
-
-        ", XF86AudioRaiseVolume,  exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+"
-        ", XF86AudioLowerVolume,  exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"
-        ", XF86AudioMute,         exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
-        ", XF86AudioMicMute,      exec, wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"
-
-        ", XF86MonBrightnessUp,   exec, brightnessctl set 5%+"
-        ", XF86MonBrightnessDown, exec, brightnessctl set 5%-"
-      ];
-
-      bindm = [
-        "$mod, mouse:272, movewindow"
-        "$mod, mouse:273, resizewindow"
-      ];
-    };
-
-    extraConfig = ''
-      bind = , XF86Launch1, exec, rog-control-center
-      bind = , XF86Launch3, exec, asusctl led-mode -n
-      bind = $mod SHIFT, G, exec, nvidia-offload ghostty
-    '';
   };
 
+  # ── hyprland.lua ────────────────────────────────────────────────────────
+  # Written directly as text — bypasses the broken HM attrset translator.
+  home.file.".config/hypr/hyprland.lua".text = ''
+    -- ═══════════════════════════════════════════════════════════════════
+    -- Hyprland config (Lua) — generated from nixos-config
+    -- ═══════════════════════════════════════════════════════════════════
+
+    local mainMod   = "SUPER"
+    local terminal  = "ghostty"
+    local browser   = "zen"             
+    local editor    = "zeditor"
+    local launcher  = "wofi --show drun"
+    local files     = "nautilus"
+
+    -- ── Monitors ──────────────────────────────────────────────────────────
+    hl.config({
+      monitor = {
+        { name = "eDP-1", resolution = "1920x1080@144", position = "0x0", scale = 1 },
+        { name = "",      resolution = "preferred",     position = "auto", scale = 1 },
+      },
+    })
+
+    -- ── Environment variables ───────────────────────────────────────────
+    hl.env("LIBVA_DRIVER_NAME", "radeonsi")
+    hl.env("GBM_BACKEND", "amdgpu")
+    hl.env("__GLX_VENDOR_LIBRARY_NAME", "mesa")
+    hl.env("XCURSOR_THEME", "Bibata-Modern-Amber")
+    hl.env("XCURSOR_SIZE", "24")
+    hl.env("QT_QPA_PLATFORM", "wayland")
+    hl.env("QT_WAYLAND_DISABLE_WINDOWDECORATION", "1")
+    hl.env("GDK_BACKEND", "wayland,x11")
+    hl.env("SDL_VIDEODRIVER", "wayland")
+    hl.env("MOZ_ENABLE_WAYLAND", "1")
+    hl.env("ELECTRON_OZONE_PLATFORM_HINT", "wayland")
+    hl.env("XDG_SESSION_TYPE", "wayland")
+    hl.env("XDG_CURRENT_DESKTOP", "Hyprland")
+    hl.env("XDG_SESSION_DESKTOP", "Hyprland")
+
+    -- ── Autostart ─────────────────────────────────────────────────────────
+    hl.on("hyprland.start", function()
+      hl.exec_cmd("swww-daemon && swww img ~/.config/hypr/wallpaper.jpg --transition-type wipe")
+      hl.exec_cmd("nm-applet --indicator")
+      hl.exec_cmd("blueman-applet")
+      hl.exec_cmd("${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1")
+      hl.exec_cmd("hyprctl setcursor Bibata-Modern-Amber 24")
+    end)
+
+    -- ── Input ─────────────────────────────────────────────────────────────
+    hl.config({
+      input = {
+        kb_layout    = "us,ara",
+        kb_options   = "grp:alt_shift_toggle",
+        follow_mouse = 1,
+        sensitivity  = 0,
+        touchpad = {
+          natural_scroll = true,
+          tap_to_click   = true,
+          drag_lock      = true,
+          scroll_factor  = 0.8,
+        },
+      },
+    })
+
+    -- ── General ───────────────────────────────────────────────────────────
+    hl.config({
+      general = {
+        gaps_in     = 5,
+        gaps_out    = 10,
+        border_size = 2,
+        ["col.active_border"]   = "rgba(${colors.yellow}ff) rgba(${colors.orange}ff) 45deg",
+        ["col.inactive_border"] = "rgba(${colors.bg1}aa)",
+        layout        = "dwindle",
+        allow_tearing = false,
+      },
+    })
+
+    -- ── Decoration ────────────────────────────────────────────────────────
+    hl.config({
+      decoration = {
+        rounding = 8,
+        blur = {
+          enabled           = true,
+          size              = 4,
+          passes            = 2,
+          ignore_opacity    = true,
+          xray              = false,
+        },
+        shadow = {
+          enabled      = true,
+          range        = 15,
+          render_power = 3,
+          color        = "rgba(${colors.bg0_hard}80)",
+        },
+        inactive_opacity = 0.93,
+        active_opacity   = 1.0,
+      },
+    })
+
+    -- ── Animations ────────────────────────────────────────────────────────
+    hl.config({
+      animations = {
+        enabled = true,
+        bezier = {
+          { "smooth",   0.05, 0.9,  0.1,  1.05 },
+          { "snappy",   0.25, 1,    0.5,  1    },
+          { "overshot", 0.13, 0.99, 0.29, 1.1  },
+          { "linear",   0,    0,    1,    1    },
+        },
+        animation = {
+          { "windows",          true, 5,  "smooth"   },
+          { "windowsOut",       true, 4,  "snappy"   },
+          { "windowsMove",      true, 4,  "smooth"   },
+          { "border",           true, 10, "default"  },
+          { "borderangle",      true, 8,  "linear"   },
+          { "fade",             true, 7,  "default"  },
+          { "workspaces",       true, 5,  "overshot" },
+          { "specialWorkspace", true, 6,  "smooth"   },
+        },
+      },
+    })
+
+    -- ── Layout: dwindle ───────────────────────────────────────────────────
+    hl.config({
+      dwindle = {
+        pseudotile     = true,
+        preserve_split = true,
+        smart_split    = true,
+      },
+      master = {
+        new_status = "master",
+      },
+    })
+
+    -- ── Gestures ──────────────────────────────────────────────────────────
+    hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })
+
+    -- ── Misc ──────────────────────────────────────────────────────────────
+    hl.config({
+      misc = {
+        force_default_wallpaper = 0,
+        disable_hyprland_logo   = true,
+        animate_manual_resizes  = true,
+        enable_swallow          = true,
+        swallow_regex           = "^(ghostty|foot)$",
+        vfr                     = true,
+      },
+    })
+
+    -- ── Window rules ──────────────────────────────────────────────────────
+    hl.windowrule({ "float",  class = "^(pavucontrol)$" })
+    hl.windowrule({ "float",  class = "^(blueman-manager)$" })
+    hl.windowrule({ "float",  class = "^(nm-connection-editor)$" })
+    hl.windowrule({ "float",  class = "^(imv)$" })
+    hl.windowrule({ "float",  title = "^(Picture-in-Picture)$" })
+    hl.windowrule({ "float",  class = "^(nwg-look)$" })
+
+    hl.windowrule({ "center", class = "^(pavucontrol)$" })
+    hl.windowrule({ "center", class = "^(blueman-manager)$" })
+
+    hl.windowrule({ "size 700 500", class = "^(pavucontrol)$" })
+    hl.windowrule({ "opacity 0.9 0.85", class = "^(org.gnome.Nautilus)$" })
+
+    hl.windowrule({ "workspace 1", class = "^(com.mitchellh.ghostty)$" })
+    hl.windowrule({ "workspace 2", class = "^(zen)$" })
+    hl.windowrule({ "workspace 3", class = "^(zeditor)$" })
+    hl.windowrule({ "workspace 3", class = "^(nvim)$" })
+    hl.windowrule({ "workspace 4", class = "^(obsidian)$" })
+    hl.windowrule({ "workspace 5", class = "^(org.gnome.Nautilus)$" })
+    hl.windowrule({ "workspace 9", class = "^(steam)$" })
+    hl.windowrule({ "workspace 9", class = "^(gamescope)$" })
+
+    -- ── Layer rules ───────────────────────────────────────────────────────
+    hl.layerrule({ "blur",       "waybar" })
+    hl.layerrule({ "ignorezero", "waybar" })
+    hl.layerrule({ "blur",       "wofi" })
+    hl.layerrule({ "ignorezero", "wofi" })
+    hl.layerrule({ "blur",       "dunst" })
+    hl.layerrule({ "ignorezero", "dunst" })
+
+    -- ── Binds: apps & session ─────────────────────────────────────────────
+    hl.bind(mainMod .. " + Return", hl.dsp.exec_cmd(terminal))
+    hl.bind(mainMod .. " + B",      hl.dsp.exec_cmd(browser))
+    hl.bind(mainMod .. " + E",      hl.dsp.exec_cmd(editor))
+    hl.bind(mainMod .. " + F",      hl.dsp.exec_cmd(files))
+    hl.bind(mainMod .. " + Space",  hl.dsp.exec_cmd(launcher))
+    hl.bind(mainMod .. " + SHIFT + C", hl.dsp.window.kill_active())
+    hl.bind(mainMod .. " + SHIFT + M", hl.dsp.exit())
+    hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("cliphist list | wofi --dmenu | cliphist decode | wl-copy"))
+
+    -- ── Binds: window state ───────────────────────────────────────────────
+    hl.bind(mainMod .. " + T", hl.dsp.window.float({ action = "toggle" }))
+    hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
+    hl.bind(mainMod .. " + O", hl.dsp.window.toggle_split())
+    hl.bind(mainMod .. " + F11",       hl.dsp.window.fullscreen({ mode = 0 }))
+    hl.bind(mainMod .. " + SHIFT + F", hl.dsp.window.fullscreen({ mode = 1 }))
+
+    -- ── Binds: focus (vim keys + arrows) ──────────────────────────────────
+    for _, pair in ipairs({ { "H", "l" }, { "L", "r" }, { "K", "u" }, { "J", "d" },
+                             { "left", "l" }, { "right", "r" }, { "up", "u" }, { "down", "d" } }) do
+      hl.bind(mainMod .. " + " .. pair[1], hl.dsp.window.move_focus(pair[2]))
+    end
+
+    -- ── Binds: move window (vim keys + arrows) ────────────────────────────
+    for _, pair in ipairs({ { "H", "l" }, { "L", "r" }, { "K", "u" }, { "J", "d" },
+                             { "left", "l" }, { "right", "r" }, { "up", "u" }, { "down", "d" } }) do
+      hl.bind(mainMod .. " + SHIFT + " .. pair[1], hl.dsp.window.move(pair[2]))
+    end
+
+    -- ── Binds: workspaces 1-10 ─────────────────────────────────────────────
+    for i = 1, 9 do
+      hl.bind(mainMod .. " + " .. tostring(i), hl.dsp.workspace.go(tostring(i)))
+      hl.bind(mainMod .. " + SHIFT + " .. tostring(i), hl.dsp.window.move_to_workspace(tostring(i)))
+    end
+    hl.bind(mainMod .. " + 0", hl.dsp.workspace.go("10"))
+    hl.bind(mainMod .. " + SHIFT + 0", hl.dsp.window.move_to_workspace("10"))
+
+    -- ── Binds: special workspace ───────────────────────────────────────────
+    hl.bind(mainMod .. " + S", hl.dsp.workspace.toggle_special("magic"))
+    hl.bind(mainMod .. " + SHIFT + S", hl.dsp.window.move_to_workspace("special:magic"))
+
+    -- ── Binds: workspace scroll ────────────────────────────────────────────
+    hl.bind(mainMod .. " + mouse_down", hl.dsp.workspace.go("e+1"))
+    hl.bind(mainMod .. " + mouse_up",   hl.dsp.workspace.go("e-1"))
+
+    -- ── Binds: screenshots ─────────────────────────────────────────────────
+    hl.bind("Print",         hl.dsp.exec_cmd("grimblast copy area"))
+    hl.bind("SHIFT + Print", hl.dsp.exec_cmd("grimblast copy output"))
+    hl.bind(mainMod .. " + Print", hl.dsp.exec_cmd(
+      "grimblast save area ~/Pictures/Screenshots/$(date +%Y%m%d_%H%M%S).png"
+    ))
+
+    -- ── Binds: misc utilities ──────────────────────────────────────────────
+    hl.bind(mainMod .. " + Backspace", hl.dsp.exec_cmd("hyprlock"))
+    hl.bind(mainMod .. " + C",          hl.dsp.exec_cmd("hyprpicker -a"))
+    hl.bind(mainMod .. " + SHIFT + W", hl.dsp.exec_cmd(
+      "swww img $(find ~/Pictures/Wallpapers -type f | shuf -n1) --transition-type wipe"
+    ))
+
+    -- ── Binds: repeatable resize ───────────────────────────────────────────
+    for _, pair in ipairs({ { "H", "-30 0" }, { "L", "30 0" }, { "K", "0 -30" }, { "J", "0 30" },
+                             { "left", "-30 0" }, { "right", "30 0" }, { "up", "0 -30" }, { "down", "0 30" } }) do
+      hl.binde(mainMod .. " + ALT + " .. pair[1], hl.dsp.window.resize_active(pair[2]))
+    end
+
+    -- ── Binds: media keys ──────────────────────────────────────────────────
+    hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+"))
+    hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"))
+    hl.bind("XF86AudioMute",        hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"))
+    hl.bind("XF86AudioMicMute",     hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"))
+    hl.bind("XF86MonBrightnessUp",   hl.dsp.exec_cmd("brightnessctl set 5%+"))
+    hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl set 5%-"))
+
+    -- ── Binds: ASUS-specific & NVIDIA offload ─────────────────────────────
+    hl.bind("XF86Launch1", hl.dsp.exec_cmd("rog-control-center"))
+    hl.bind("XF86Launch3", hl.dsp.exec_cmd("asusctl led-mode -n"))
+    hl.bind(mainMod .. " + SHIFT + G", hl.dsp.exec_cmd("nvidia-offload ghostty"))
+
+    -- ── Mouse binds ────────────────────────────────────────────────────────
+    hl.bind(mainMod .. " + mouse:272", hl.dsp.window.move_active())
+    hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize_active())
+  '';
+
+  # ── hyprlock ──────────────────────────────────────────────────────────
   programs.hyprlock = {
     enable = true;
     settings = {

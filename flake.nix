@@ -29,7 +29,7 @@
     stylix = {
       url = "github:nix-community/stylix";
       inputs.nixpkgs.follows    = "nixpkgs";
-      inputs.home-manager.follows = "home-manager";
+      #inputs.home-manager.follows = "home-manager";
     };
 
     # Zen Browser — not yet in nixpkgs.

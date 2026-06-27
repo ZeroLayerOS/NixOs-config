@@ -1,2 +1,2 @@
-flake.lock
-hosts/default/hardware-configuration.nix
+#flake.lock
+#hosts/default/hardware-configuration.nix
